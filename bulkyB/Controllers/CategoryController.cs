@@ -11,7 +11,7 @@ namespace bulkyB.Controllers
         public CategoryController(ApplicationDbContext db)
         {
 
-        _db = db; 
+            _db = db;
         }
         public IActionResult Index()
         {
@@ -21,10 +21,10 @@ namespace bulkyB.Controllers
         //GEt
         public IActionResult Create()
         {
-           
+
             return View();
         }
-        
+
         // POSt
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -38,6 +38,7 @@ namespace bulkyB.Controllers
             {
                 _db.Categories.Add(obj);
                 _db.SaveChanges();
+                TempData["sucess"] = "Category Created sucessfully";
                 return RedirectToAction("Index");
             }
             return View(obj);
@@ -46,7 +47,7 @@ namespace bulkyB.Controllers
         //GEt
         public IActionResult Edit(int? id)
         {
-            if (id == null || id== 0)
+            if (id == null || id == 0)
             {
                 return NotFound();
             }
@@ -62,7 +63,7 @@ namespace bulkyB.Controllers
         // POSt
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Category obj)
+        public IActionResult Edit(Category obj)
         {
             if (obj.Name == obj.DisplayOrder.ToString())
             {
@@ -70,10 +71,46 @@ namespace bulkyB.Controllers
             }
             if (ModelState.IsValid)
             {
-                _db.Categories.Add(obj);
+                _db.Categories.Update(obj);
                 _db.SaveChanges();
+                TempData["sucess"] = "Category Updated sucessfully";
                 return RedirectToAction("Index");
             }
             return View(obj);
         }
+
+        public IActionResult Delete(int? id)
+        {
+            if (id == null || id == 0)
+            {
+                return NotFound();
+            }
+            var CategoryFromDb = _db.Categories.Find(id);
+            if (CategoryFromDb == null)
+            {
+                return NotFound();
+            }
+
+            return View(CategoryFromDb);
+        }
+
+        // POSt
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeletePOST(int? id)
+        {
+            var obj = _db.Categories.Find(id); 
+            if (obj == null)
+            {
+                return NotFound();
+            }
+            
+                _db.Categories.Remove(obj);
+                _db.SaveChanges();
+            TempData["sucess"] = "Category Deleted sucessfully";
+            return RedirectToAction("Index");
+          
+            
+        }
+    }
 }
